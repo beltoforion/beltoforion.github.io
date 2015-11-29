@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="javascript_samples/tides/tides.js"></script>
+  <script src="javascript_samples/shared/vector.js"></script>
+  <link rel="stylesheet" type="text/css" href="./styles/index.css"/>
+  <link rel="stylesheet" type="text/css" href="./styles/article.css"/>
+</head>
+
+<body class="article">
+  <div>
+    <h1 class="article_caption">Example 3: Illustration of Tidal Forces</h1>
+    <p>
+    This is the demonstration page of the tidal simulation javascript applet. For more details about 
+    the please turn to the <a href="http://articles.beltoforion.de/article.php?a=tides_explained" target="_blank">original article.</a>
+    </p>
+    <table class="noborder">
+      <tr>
+        <td  class="noborder">
+          <canvas id="cvTides2" width="800" height="800"></canvas>
+        </td>
+
+        <td class="noborder">	
+          <form> 
+            <h2>Animation Settings</h2> 
+            <fieldset> 
+              <b>Look at</b> 
+              <select id="cbViewPoint" name="viewpoint" onChange="OnChangeViewPoint();">
+	        <option value="Earth">Earth</option>
+                <option value="Moon">Moon</option>
+                <option value="CenterOfMass">Center of Mass</option>
+              </select>
+            </fieldset>
+
+            <fieldset>  
+              <b>Render Features</b><br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowOrbits"        onChange="OnShowOrbits();"/> 
+              Show Orbits<br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowSurfacePoints" onChange="OnShowSurfacePoints();"/> 
+              Show Surface Points (Earth)<br/>
+            </fieldset>
+
+            <fieldset>  
+	      <b>Force display</b><br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowTidalAcc"      onChange="OnShowTidalAcc();"/>
+              Show Tidal Acceleration<br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowGravAcc"       onChange="OnShowGravAcc();"/>
+              Show Gravitational Acceleration (From Moon)<br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowCentAcc"       onChange="OnShowCentAcc();"/>
+              Show Centrifugal Acceleration<br/>
+            </fieldset>
+          </form>
+        </td>
+      </tr>
+  </table>
+</div>
+	<script>
+                var tidalModel = tidalSimulation({ cvid               : 'cvTides2',
+                                                   path               : './javascript_samples/tides',	
+                                                   lookAtTarget       : 'CenterOfMass',
+                                                   autoMove           : true,
+                                                   setup              : 1,
+	                                           isRunning          : true,
+                                                   showSun            : false,
+                                                   useDifferentScales : true,
+                                                   showMoon           : true,
+                                                   showMoonOrbit      : true,
+                                                   showEarthOrbit     : true,
+                                                   showSurfacePoints  : false,
+                                                   showGravAcc        : false,
+                                                   showCentAcc        : false,
+                                                   showTidalAcc       : true });
+
+		// Set up formular controls
+		document.getElementById("cbViewPoint").value            = tidalModel.config.lookAtTarget;
+		document.getElementById("cbShowOrbits").checked         = tidalModel.config.showEarthOrbit || model2.config.showMoonOrbit;
+		document.getElementById("cbShowSurfacePoints").checked  = tidalModel.config.showSurfacePoints;
+		document.getElementById("cbShowTidalAcc").checked       = tidalModel.config.showTidalAcc;
+		document.getElementById("cbShowGravAcc").checked        = tidalModel.config.showGravAcc;
+		document.getElementById("cbShowCentAcc").checked        = tidalModel.config.showCentAcc;
+
+		function OnChangeViewPoint()
+		{
+			tidalModel.config.lookAtTarget = document.getElementById("cbViewPoint").value;
+		}
+
+		function OnShowOrbits()
+		{
+			var check = document.getElementById("cbShowOrbits").checked;
+                        tidalModel.config.showEarthOrbit = check;
+                        tidalModel.config.showMoonOrbit = check;
+		}
+
+		function OnShowSurfacePoints()
+		{
+                        tidalModel.config.showSurfacePoints = document.getElementById("cbShowSurfacePoints").checked;
+		}
+
+		function OnShowTidalAcc()
+		{
+                        tidalModel.config.showTidalAcc = document.getElementById("cbShowTidalAcc").checked;
+		}
+
+		function OnShowGravAcc()
+		{
+                        tidalModel.config.showGravAcc = document.getElementById("cbShowGravAcc").checked;
+		}
+
+		function OnShowCentAcc()
+		{
+                        tidalModel.config.showCentAcc = document.getElementById("cbShowCentAcc").checked;
+		}
+	</script>
+</body>
+</html>
