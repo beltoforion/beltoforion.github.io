@@ -23,11 +23,11 @@ var World = function(cv, cfg) {
 	// Constants and buffer variables
 	this.gamma = 6.67408e-11;			  	// gravitation constant in m³/(kg*s²)
 	this.distMoonEarth = 384400000 		          	// distance moon to earth in meter
-	this.distEarthSun = this.distMoonEarth * 389.172; 	// distance sun to earth 
+	this.distEarthSun = 149597870700                        // distance sun to earth 
 
 	// Some vectors of common use
-	this.vecEarthSun = new Vector(0,0);		  	// Vector pointing from the earth towards the sun
-	this.vecEarthMoon = new Vector(0,0);		  	// Vector pointing from the earth towards the moon
+	this.vecEarthSun = new Vector(0,0)                      // Vector pointing from the earth towards the sun
+	this.vecEarthMoon = new Vector(0,0)                     // Vector pointing from the earth towards the moon
 
 	if (cfg.setup==0) {
 		// A setup for illustrating moons gravitational effect on earth
@@ -61,23 +61,23 @@ var World = function(cv, cfg) {
 		this.canvas.world = this;
 	} else if (cfg.setup==1) {
 		this.forceMultiplier = 0.00000004;
-		this.ts = 86400/10;				// timestep size in seconds i need timesteps for the blinking 
-		this.scaleDist = 0.0000006;			// scale for dimensions
-		this.scaleSize = this.scaleDist;			// scale for sizes	
+		this.ts = 86400/10;                             // timestep size in seconds i need timesteps for the blinking 
+		this.scaleDist = 0.0000006;                     // scale for dimensions
+		this.scaleSize = this.scaleDist;                // scale for sizes	
 		this.distMoonEarth = 484400000 		        // distance moon to earth in meter
 
-		this.earth = {
-			pos         :	new Vector(0, 0),	// earth position
-			m           :	5.9721986e24,		// earth mass
-			r           :	15*12735/2.0*1000,		// earth radius in meter
-			p           : 	365.256 * 86400,	// siderial in seconds
-			tidal_force :	[this.numArrows + 1]	// Tidal force arrows of the moon
+                this.earth = {
+                        pos         :	new Vector(0, 0),       // earth position
+			m           :	5.9721986e24,	        // earth mass
+			r           :	15*12735/2.0*1000,      // earth radius in meter
+			p           : 	365.256 * 86400,        // siderial in seconds
+			tidal_force :	[this.numArrows + 1]    // Tidal force arrows of the moon
 		};
 
 		this.moon = {
-			pos      :	new Vector(0, 0),	// moon position
-			m        :	15*7.349e22,		// moon mass
-			r        :	15*3476/2.0*1000,		// moon radius in meter
+			pos      :	new Vector(0, 0),       // moon position
+			m        :	15*7.349e22,            // moon mass
+			r        :	15*3476/2.0*1000,       // moon radius in meter
 			p	 : 	27.322 * 86400		// siderial in seconds
 		};
 
@@ -102,21 +102,22 @@ var World = function(cv, cfg) {
 
 		// Earth
 		colEarth	:  	'rgb(30,130,220)',
-		colEarthDark	:	'rgb(30,30,80)',		
+		colEarthDark	:	'rgba(0, 0, 0, 0.7)',		
 		colEarthOutline :	'darkGrey',
 
 		// Moon
 		colMoon		:	'white',
-		colMoonDark	:	'rgb(20,20,40)',
+		colMoonDark	:	'rgba(0, 0, 0, 0.9)',
 		colMoonOutline	:	'darkGrey',
 
 		// 
-		colVec1  	: 	'rgba(255,255,255,0.4)', // white -ish
-		colVec2  	: 	'rgba(255,128,128,0.4)', // orange -ish
-		colVec3  	: 	'#ffffff',   // blue -ish
-		colOrbit        :       'rgba(255,165,0,0.5)',
+		colVec1  	: 	'rgba(255, 255, 255, 0.4)', // white -ish
+		colVec2  	: 	'rgba(255, 128, 128, 0.4)', // orange -ish
+		colVec3  	: 	'#ffffff',                
+		colOrbit        :       'rgba(255, 165, 0, 0.5)',
 		colOrigin	:	'yellow',
-		colCenterOfEarth:	'rgba(255,165,0,1)'
+		colCenterOfEarth:	'rgba(255, 165, 0,   1)',
+                colSun          :	'rgba(255, 255, 0, 0.5)'
 	};
 
 	this.dragDropImage = new Image();
@@ -124,8 +125,6 @@ var World = function(cv, cfg) {
 
 	this.continentsImage = new Image();
 	this.continentsImage.src = this.config.path + "/images/continents.png";
-	//this.contindddentsImage.style.width = '50px';
-	//this.continentsImage.style.height = '50px';
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -251,12 +250,24 @@ World.prototype.moveEarth = function() {
 	this.earth.pos.y = y;
 }
 
+World.prototype.moveSun = function() {
+	// Yeah, lets briefly discard 2000 years of astronomy and pretend
+        // the sun is orbitting the earth. It doesn't really matter for
+        // this visualization...
+	var a = this.time * 2 * Math.PI / this.earth.p;
+	var x = Math.sin(a) * this.distEarthSun;
+	var y = Math.cos(a) * this.distEarthSun;
+	this.sun.pos.x = this.earth.pos.x + x;
+	this.sun.pos.y = this.earth.pos.y + y;
+}
+
+
 World.prototype.move = function() {
 
 	if (this.config.autoMove) {
-		// Update Sun Arrow
 		this.moveEarth();
 		this.moveMoon();
+		this.moveSun();
 	}
 
 	// update the position vectors
@@ -344,6 +355,45 @@ World.prototype.update = function() {
 //
 //-------------------------------------------------------------------------------------------------
 
+World.prototype.renderSun = function() {
+
+	// Draw Center of Mass of the system Earth-Moon
+	var v1 = this.earth.pos.clone().multiplyValue(this.earth.m);
+	var v2 = this.moon.pos.clone().multiplyValue(this.moon.m);
+	var cm = this.mapToScreen(Vector.addEx(v1, v2).divideValue(this.earth.m + this.moon.m));
+
+
+	// Draw an arrow pointing from the sun towards earth
+	var posSunScreen = this.mapToScreen(this.sun.pos, this.scaleDist);
+        var posEarthScreen = this.mapToScreen(this.earth.pos, this.scaleDist);	
+
+	var vecBeam = posSunScreen.clone().subtract(cm).normalize()
+	var vecBeamOrtho = new Vector(vecBeam.y, -vecBeam.x).multiplyValue(this.earth.r * this.scaleDist)
+	var offset = vecBeam.multiplyValue(this.earth.r * this.scaleDist * 0)
+
+	// render 5 lightbeams as an indication of where the sun is
+	for (var i=0; i<5; ++i)
+        {
+          this.ctx.drawArrow(posSunScreen.x, 
+                             posSunScreen.y,
+                             cm.x + i*vecBeamOrtho.x - offset.x, 
+                             cm.y + i*vecBeamOrtho.y - offset.y, 
+                             10, 
+                             2, 
+                             this.style.colSun);
+		
+          if (i>0) {
+            this.ctx.drawArrow(posSunScreen.x,
+                               posSunScreen.y, 
+                               cm.x - i*vecBeamOrtho.x - offset.x, 
+                               cm.y - i*vecBeamOrtho.y - offset.y, 
+                               10, 
+                               2, 
+                               this.style.colSun);
+          }
+        }
+}
+
 World.prototype.renderMoon = function() {
 
 	// compute the render position of the moon
@@ -396,10 +446,10 @@ World.prototype.renderEarth = function() {
 
 
 	// Nightside
-	if (this.config.is_sun_shown) {
+	if (this.config.showSun) {
 		var a1 = this.vecEarthSun.verticalAngle();
 		var a2 = a1 + Math.PI;
-		this.ctx.drawCircle(posEarthScreen, r, a1, a2, this.style.colEarth, this.style.colEarthOutline);
+		this.ctx.drawCircle(posEarthScreen, r, a1, a2, this.style.colEarthDark, this.style.colEarthOutline);
 	}
 
 	if (this.config.showGravAcc || this.config.showTidalAcc) {
@@ -432,10 +482,9 @@ World.prototype.renderEarth = function() {
 		}
 
 		// Draw vectors at the earths center
-		var tf = this.earth.tidal_force[0].clone();
-		tf.multiplyValue(this.forceMultiplier);
-
 		if (this.config.showGravAcc) {
+			var tf = this.earth.tidal_force[0].clone();
+			tf.multiplyValue(this.forceMultiplier);
 			this.ctx.drawVector(posEarthScreen.x, posEarthScreen.y, tf.x, tf.y, 5, 4, this.style.colVec1);	
 		}
 	}
@@ -519,12 +568,18 @@ World.prototype.render = function() {
 	this.ctx.fillStyle = this.style.colBack;
 	this.ctx.fillRect(0,0, this.w, this.h);
 
+	if (this.config.showSun) {
+                this.renderSun();
+        }
+
 	this.renderUnderlay();
+
 	this.renderEarth();
 
 	if (this.config.showMoon) {
         	this.renderMoon();	
 	}
+
 
 	this.renderOverlays();
 }
@@ -565,17 +620,18 @@ function tidalSimulation(cfg) {
 	}
 
 
-	ctx.drawArrow = function(x1, y1, x2, y2, len, w) {
+	ctx.drawArrow = function(x1, y1, x2, y2, len, w, col) {
 		var a = Math.atan2(y2-y1, x2-x1);
-
+		this.beginPath();
 		this.moveTo(x1, y1);
 		this.lineTo(x2, y2);
 		this.lineTo(x2 - len * Math.cos(a - Math.PI/6), y2 - len * Math.sin(a - Math.PI/7));
 		this.moveTo(x2, y2);
 		this.lineTo(x2 - len * Math.cos(a + Math.PI/6), y2 - len * Math.sin(a + Math.PI/7));
 		this.lineWidth = (w!=null) ? w : 2;
-		this.strokeStyle = 'yellow';
+		this.strokeStyle = (col!=null) ? col : 'yellow';
 		this.stroke();
+		this.closePath();
 	}
 
 	ctx.drawCross = function(x, y, w, l, color) {

@@ -42,6 +42,14 @@
             </fieldset>
 
             <fieldset>  
+              <b>Planetyry Bodies</b><br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowMoon"   onChange="OnShowMoon();"/> 
+              Show Moon<br/>
+              <input type="checkbox"  name="show orbits" value="true" id="cbShowSun"    onChange="OnShowSun();"/> 
+              Show Sun<br/>
+            </fieldset>
+
+            <fieldset>  
 	      <b>Force display</b><br/>
               <input type="checkbox"  name="show orbits" value="true" id="cbShowTidalAcc"      onChange="OnShowTidalAcc();"/>
               Show Tidal Acceleration<br/>
@@ -79,6 +87,9 @@
 		document.getElementById("cbShowTidalAcc").checked       = tidalModel.config.showTidalAcc;
 		document.getElementById("cbShowGravAcc").checked        = tidalModel.config.showGravAcc;
 		document.getElementById("cbShowCentAcc").checked        = tidalModel.config.showCentAcc;
+		document.getElementById("cbShowMoon").checked           = tidalModel.config.showMoon;
+		document.getElementById("cbShowSun").checked            = tidalModel.config.showSun;
+
 
 		function OnChangeViewPoint()
 		{
@@ -110,6 +121,16 @@
 		function OnShowCentAcc()
 		{
                         tidalModel.config.showCentAcc = document.getElementById("cbShowCentAcc").checked;
+		}
+
+		function OnShowSun()
+		{
+                        tidalModel.config.showSun = document.getElementById("cbShowSun").checked;
+		}
+
+		function OnShowMoon()
+		{
+                        tidalModel.config.showMoon = document.getElementById("cbShowMoon").checked;
 		}
 	</script>
 </body>
