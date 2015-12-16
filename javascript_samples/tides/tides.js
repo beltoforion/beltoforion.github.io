@@ -119,7 +119,7 @@ var World = function(cv, cfg) {
 		colOrbit        :       'rgba(255, 165, 0, 0.5)',
 		colOrigin	:	'yellow',
 		colCenterOfEarth:	'rgba(255, 165, 0,   1)',
-                colSun          :	'rgba(255, 255, 0, 0.5)'
+                colSun          :	'rgba(255, 255, 0, 0.7)'
 	};
 
 	this.dragDropImage = new Image();
