@@ -51,11 +51,15 @@
 
             <fieldset>  
 	      <b>Force display</b><br/>
-              <input type="checkbox"  name="show orbits" value="true" id="cbShowTidalAcc"      onChange="OnShowTidalAcc();"/>
-              Show Tidal Acceleration<br/>
-              <input type="checkbox"  name="show orbits" value="true" id="cbShowGravAcc"       onChange="OnShowGravAcc();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowTidalAcc"      onChange="OnShowTidalAcc();"/>
+              Show Tidal Acceleration (Moon)<br/>
+              <input type="checkbox"  name="force" value="true" id="cbShowTidalAccSun"   onChange="OnShowTidalAccSun();"/>
+              Show Tidal Acceleration (Sun)<br/>
+              <input type="checkbox"  name="force" value="true" id="cbShowOcean"         onChange="OnShowOcean();"/>
+              Show Ocean<br/>
+              <input type="checkbox"  name="force" value="true" id="cbShowGravAcc"       onChange="OnShowGravAcc();"/>
               Show Gravitational Acceleration (From Moon)<br/>
-              <input type="checkbox"  name="show orbits" value="true" id="cbShowCentAcc"       onChange="OnShowCentAcc();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowCentAcc"       onChange="OnShowCentAcc();"/>
               Show Centrifugal Acceleration<br/>
             </fieldset>
           </form>
@@ -78,18 +82,21 @@
                                                    showSurfacePoints  : false,
                                                    showGravAcc        : false,
                                                    showCentAcc        : false,
-                                                   showTidalAcc       : true });
+                                                   showTidalAcc       : true,
+                                                   showTidalAccSun    : false,
+		                                   showAccSum         : false });
 
 		// Set up formular controls
 		document.getElementById("cbViewPoint").value            = tidalModel.config.lookAtTarget;
 		document.getElementById("cbShowOrbits").checked         = tidalModel.config.showEarthOrbit || model2.config.showMoonOrbit;
 		document.getElementById("cbShowSurfacePoints").checked  = tidalModel.config.showSurfacePoints;
 		document.getElementById("cbShowTidalAcc").checked       = tidalModel.config.showTidalAcc;
+		document.getElementById("cbShowTidalAccSun").checked    = tidalModel.config.showTidalAccSun;
+		document.getElementById("cbShowOcean").checked          = tidalModel.config.showAccSum;
 		document.getElementById("cbShowGravAcc").checked        = tidalModel.config.showGravAcc;
 		document.getElementById("cbShowCentAcc").checked        = tidalModel.config.showCentAcc;
 		document.getElementById("cbShowMoon").checked           = tidalModel.config.showMoon;
 		document.getElementById("cbShowSun").checked            = tidalModel.config.showSun;
-
 
 		function OnChangeViewPoint()
 		{
@@ -111,6 +118,16 @@
 		function OnShowTidalAcc()
 		{
                         tidalModel.config.showTidalAcc = document.getElementById("cbShowTidalAcc").checked;
+		}
+
+		function OnShowTidalAccSun()
+		{
+                        tidalModel.config.showTidalAccSun = document.getElementById("cbShowTidalAccSun").checked;
+		}
+
+		function OnShowOcean()
+		{
+                        tidalModel.config.showAccSum = document.getElementById("cbShowOcean").checked;
 		}
 
 		function OnShowGravAcc()

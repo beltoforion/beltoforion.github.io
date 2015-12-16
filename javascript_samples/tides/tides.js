@@ -23,10 +23,10 @@ var World = function(cv, cfg) {
 	// Constants and buffer variables
 	this.gamma = 6.67408e-11;			  	// gravitation constant in m³/(kg*s²)
 	this.distMoonEarth = 384400000 		          	// distance moon to earth in meter
-	this.distEarthSun = 149597870700                        // distance sun to earth 
+	this.distEarthSun  = 149597870700                       // distance sun to earth 
 
 	// Some vectors of common use
-	this.vecEarthSun = new Vector(0,0)                      // Vector pointing from the earth towards the sun
+	this.vecEarthSun  = new Vector(0,0)                     // Vector pointing from the earth towards the sun
 	this.vecEarthMoon = new Vector(0,0)                     // Vector pointing from the earth towards the moon
 
 	if (cfg.setup==0) {
@@ -40,11 +40,12 @@ var World = function(cv, cfg) {
 		this.lookAt = new Vector(0, 0);			// Rendering engin is looking at this position
 		
 		this.earth = {
-			pos         :	new Vector(-9000000, 0),	// earth position
-			m           :	5.9721986e24,		// earth mass
-			r           :	12735/2.0*1000,		// earth radius in meter
-			p           : 	365.256 * 86400,	// siderial in seconds
-			tidal_force :  	[this.numArrows + 1]    // Tidal force arrows of the moon
+			pos           : new Vector(-9000000, 0), // earth position
+			m             : 5.9721986e24,            // earth mass
+			r             : 12735/2.0*1000,	         // earth radius in meter
+			p             : 365.256 * 86400,         // siderial in seconds
+			tidalForce    : [this.numArrows + 1],    // Tidal force arrows of the moon
+			tidalForceSun : [this.numArrows + 1]     // Tidal force arrows of the moon
 		};
 
 		this.moon = {
@@ -62,21 +63,22 @@ var World = function(cv, cfg) {
 	} else if (cfg.setup==1) {
 		this.forceMultiplier = 0.00000004;
 		this.ts = 86400/10;                             // timestep size in seconds i need timesteps for the blinking 
-		this.scaleDist = 0.0000006;                     // scale for dimensions
+		this.scaleDist = 0.0000006;                     // scale missingfor dimensions
 		this.scaleSize = this.scaleDist;                // scale for sizes	
 		this.distMoonEarth = 484400000 		        // distance moon to earth in meter
 
                 this.earth = {
-                        pos         :	new Vector(0, 0),       // earth position
-			m           :	5.9721986e24,	        // earth mass
-			r           :	15*12735/2.0*1000,      // earth radius in meter
-			p           : 	365.256 * 86400,        // siderial in seconds
-			tidal_force :	[this.numArrows + 1]    // Tidal force arrows of the moon
+                        pos           :	new Vector(0, 0),       // earth position
+			m             :	5.9721986e24,	        // earth mass
+			r             :	15*12735/2.0*1000,      // earth radius in meter
+			p             : 365.256 * 86400,        // siderial in seconds
+			tidalForce    :	[this.numArrows + 1],   // Tidal force arrows of the moon
+			tidalForceSun : [this.numArrows + 1]    // Tidal force arrows of the moon
 		};
 
 		this.moon = {
 			pos      :	new Vector(0, 0),       // moon position
-			m        :	15*7.349e22,            // moon mass
+			m        :	15*7.349e22,               // moon mass
 			r        :	15*3476/2.0*1000,       // moon radius in meter
 			p	 : 	27.322 * 86400		// siderial in seconds
 		};
@@ -89,11 +91,9 @@ var World = function(cv, cfg) {
 	// Celestial Bodies
 
 	this.sun = {
-		pos      :	new Vector(0, 0),	// sun position (remains fixed throughout the simulation)
-		m        :	1.98855e30,		// sun mass in kg
-		r        :	696342000 ,		// sun radius in meter
-		// sun specific rendering
-		lenArrow : 	80			// arrow length in pixel
+		pos      :	new Vector(0, 0),    // sun position (remains fixed throughout the simulation)
+		m        :	10*1.98855e30,          // sun mass in kg
+		r        :	696342000            // sun radius in meter
 	}
 
 	// Color and style definitions
@@ -113,7 +113,9 @@ var World = function(cv, cfg) {
 		// 
 		colVec1  	: 	'rgba(255, 255, 255, 0.4)', // white -ish
 		colVec2  	: 	'rgba(255, 128, 128, 0.4)', // orange -ish
-		colVec3  	: 	'#ffffff',                
+		colVec3  	: 	'#ffffff',
+      		colVec4  	: 	'rgba(255, 165, 0, 0.8)',
+      		colWater  	: 	'rgba(30, 130, 220, 0.7)',
 		colOrbit        :       'rgba(255, 165, 0, 0.5)',
 		colOrigin	:	'yellow',
 		colCenterOfEarth:	'rgba(255, 165, 0,   1)',
@@ -320,13 +322,23 @@ World.prototype.updateEarth = function() {
 	var accEarthMoon = this.vecEarthMoon.clone();
 	accEarthMoon.normalize();
 	accEarthMoon.multiplyValue(this.gamma * this.moon.m / Math.pow(this.vecEarthMoon.length() * scaleDist, 2));
-	this.earth.tidal_force[0] = accEarthMoon; 
+	this.earth.tidalForce[0] = accEarthMoon; 
 
+	var accEarthSun = this.vecEarthSun.clone();
+	accEarthSun.normalize();
+	accEarthSun.multiplyValue(this.gamma * this.sun.m / Math.pow(this.vecEarthSun.length() * scaleDist, 2));
+	this.earth.tidalForceSun[0] = accEarthSun; 
+     
 	// Compute accelerations for the earths surface
 	for (var i=1; i<this.numArrows + 1; ++i)
 	{
 		var posSurface = new Vector(Math.sin(i*delta) * this.earth.r * scaleSize,
         	                            Math.cos(i*delta) * this.earth.r * scaleSize);
+
+		//
+		// Tidal effect of the moon
+		//
+
 		var posMoon = this.vecEarthMoon.clone();
 	  	posMoon.multiplyValue(scaleDist);
 
@@ -338,7 +350,24 @@ World.prototype.updateEarth = function() {
 		accMoon.multiplyValue(this.gamma * this.moon.m / (len*len));
 		
 		// The resulting Gravitational force
-		this.earth.tidal_force[i] = accMoon; 
+		this.earth.tidalForce[i] = accMoon; 
+
+		//
+		// Tidal effect of the sun
+		//
+
+		var posSun = this.vecEarthSun.clone();
+	  	posSun.multiplyValue(scaleDist);
+
+		// Create a normalized vector pointing from the earth surface to the moon center and compute 
+		// the gavitation force
+		var accSun = Vector.subtractEx(posSun, posSurface);
+		accSun.normalize();
+		var len = Vector.subtractEx(posSun, posSurface).length() + zeroLength;
+		accSun.multiplyValue(this.gamma * this.sun.m / (len*len));
+		
+		// The resulting Gravitational force
+		this.earth.tidalForceSun[i] = accSun; 
 	}	
 }
 
@@ -444,7 +473,6 @@ World.prototype.renderEarth = function() {
 	// continents
 	this.ctx.drawImage(this.continentsImage, posEarthScreen.x - r, posEarthScreen.y - r, 2*r, 2*r);
 
-
 	// Nightside
 	if (this.config.showSun) {
 		var a1 = this.vecEarthSun.verticalAngle();
@@ -452,7 +480,9 @@ World.prototype.renderEarth = function() {
 		this.ctx.drawCircle(posEarthScreen, r, a1, a2, this.style.colEarthDark, this.style.colEarthOutline);
 	}
 
-	if (this.config.showGravAcc || this.config.showTidalAcc) {
+	if (this.config.showGravAcc || this.config.showTidalAcc || this.config.showAccSum) {
+		var results = [this.numArrows + 1];
+	
 		// Draw Vector arrows
 		var delta = 2 * Math.PI / this.numArrows;
 		for (var i=1; i<this.numArrows + 1; ++i) {
@@ -460,30 +490,68 @@ World.prototype.renderEarth = function() {
 			var posScreen = Vector.addEx(posEarthScreen, new Vector(Math.sin(i*delta) * this.earth.r * this.scaleSize,
 	 							                Math.cos(i*delta) * this.earth.r * this.scaleSize));
 
-			// Tidal force
-			var v1 = this.earth.tidal_force[i];
+			//
+			// Tidal force Moon
+			//
+
+			var v1 = this.earth.tidalForce[i];
 			v1.multiplyValue(this.forceMultiplier);
 		
 			if (this.config.showGravAcc) {
 				this.ctx.drawVector(posScreen.x, posScreen.y, v1.x, v1.y, 5, 2, this.style.colVec1);	
 			}				
 
-			var v2 = this.earth.tidal_force[0].clone();
+			var v2 = this.earth.tidalForce[0].clone();
 			v2.multiplyValue(this.forceMultiplier);
 
 			if (this.config.showCentAcc) {
 				this.ctx.drawVector(posScreen.x, posScreen.y, -v2.x, -v2.y, 5, 2, this.style.colVec2);
 			}
 
+			var v3 = Vector.subtractEx(v1, v2);
 			if (this.config.showTidalAcc) {	
-				var v3 = Vector.subtractEx(v1, v2);
-				this.ctx.drawVector(posScreen.x, posScreen.y, v3.x, v3.y, 5, 4, this.style.colVec3);	
+				this.ctx.drawVector(posScreen.x, posScreen.y, v3.x, v3.y, 4, 3, this.style.colVec3);	
 			}
+
+			//
+			// Tidal force Sun
+			//
+
+			var v4 = this.earth.tidalForceSun[i];
+			v4.multiplyValue(this.forceMultiplier);
+		
+			var v5 = this.earth.tidalForceSun[0].clone();
+			v5.multiplyValue(this.forceMultiplier);
+
+			var v6 = Vector.subtractEx(v4, v5);
+			if (this.config.showTidalAccSun) {	
+				this.ctx.drawVector(posScreen.x, posScreen.y, v6.x, v6.y, 4, 3, this.style.colVec4);
+			}
+
+			//
+			// Combination of Sun and Moon forces
+			//
+			
+			results[i] = { x : posScreen.x + v3.x + v6.x,
+                                       y : posScreen.y + v3.y + v6.y };
 		}
+
+
+		if (this.config.showAccSum) {
+			this.ctx.fillStyle = this.style.colWater;
+			this.ctx.beginPath();
+			this.ctx.moveTo(results[0].x, results[0].y);
+			for (var i=1; i<this.numArrows + 1; ++i) {
+				this.ctx.lineTo(results[i].x, results[i].y);
+			}
+			this.ctx.closePath();
+			this.ctx.fill();
+		}
+
 
 		// Draw vectors at the earths center
 		if (this.config.showGravAcc) {
-			var tf = this.earth.tidal_force[0].clone();
+			var tf = this.earth.tidalForce[0].clone();
 			tf.multiplyValue(this.forceMultiplier);
 			this.ctx.drawVector(posEarthScreen.x, posEarthScreen.y, tf.x, tf.y, 5, 4, this.style.colVec1);	
 		}
