@@ -119,7 +119,7 @@ var World = function(cv, cfg) {
 		colOrbit        :       'rgba(255, 165, 0, 0.5)',
 		colOrigin	:	'yellow',
 		colCenterOfEarth:	'rgba(255, 165, 0,   1)',
-                colSun          :	'rgba(255, 255, 0, 0.7)'
+                colSun          :	'rgba(255, 235, 50, 0.5)'
 	};
 
 	this.dragDropImage = new Image();
@@ -386,10 +386,8 @@ World.prototype.update = function() {
 
 World.prototype.renderSun = function() {
 
-	// Draw Center of Mass of the system Earth-Moon
-	var v1 = this.earth.pos.clone().multiplyValue(this.earth.m);
-	var v2 = this.moon.pos.clone().multiplyValue(this.moon.m);
-	var cm = this.mapToScreen(Vector.addEx(v1, v2).divideValue(this.earth.m + this.moon.m));
+	// draw sunbeams to the lookAt Position
+	var cm = this.mapToScreen(this.lookAt);
 
 
 	// Draw an arrow pointing from the sun towards earth
@@ -401,7 +399,7 @@ World.prototype.renderSun = function() {
 	var offset = vecBeam.multiplyValue(this.earth.r * this.scaleDist * 0)
 
 	// render 5 lightbeams as an indication of where the sun is
-	for (var i=0; i<5; ++i)
+	for (var i=0; i<10; ++i)
         {
           this.ctx.drawArrow(posSunScreen.x, 
                              posSunScreen.y,
