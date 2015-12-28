@@ -61,25 +61,25 @@ var World = function(cv, cfg) {
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 		this.canvas.world = this;
 	} else if (cfg.setup==1) {
-		this.forceMultiplier = 0.00000004;
-		this.ts = 86400/10;                             // timestep size in seconds i need timesteps for the blinking 
-		this.scaleDist = 0.0000006;                     // scale missingfor dimensions
-		this.scaleSize = this.scaleDist;                // scale for sizes	
-		this.distMoonEarth = 484400000 		        // distance moon to earth in meter
+                this.forceMultiplier = 0.00000004;
+                this.ts = 86400/10;                             // timestep size in seconds i need timesteps for the blinking 
+                this.scaleDist = 0.0000006;                     // scale missingfor dimensions
+                this.scaleSize = 0.00001;                       // scale for sizes	
+                this.distMoonEarth = 484400000 		        // distance moon to earth in meter
 
                 this.earth = {
                         pos           :	new Vector(0, 0),       // earth position
 			m             :	5.9721986e24,	        // earth mass
-			r             :	15*12735/2.0*1000,      // earth radius in meter
+			r             :	12735/2.0*1000,         // earth radius in meter
 			p             : 365.256 * 86400,        // siderial in seconds
 			tidalForce    :	[this.numArrows + 1],   // Tidal force arrows of the moon
 			tidalForceSun : [this.numArrows + 1]    // Tidal force arrows of the moon
-		};
+                };
 
 		this.moon = {
 			pos      :	new Vector(0, 0),       // moon position
-			m        :	15*7.349e22,               // moon mass
-			r        :	15*3476/2.0*1000,       // moon radius in meter
+			m        :	15*7.349e22,            // moon mass
+			r        :	3476/2.0*1000,          // moon radius in meter
 			p	 : 	27.322 * 86400		// siderial in seconds
 		};
 
@@ -90,37 +90,37 @@ var World = function(cv, cfg) {
 
 	// Celestial Bodies
 
-	this.sun = {
-		pos      :	new Vector(0, 0),    // sun position (remains fixed throughout the simulation)
-		m        :	10*1.98855e30,          // sun mass in kg
-		r        :	696342000            // sun radius in meter
-	}
+        this.sun = {
+                pos      :	new Vector(0, 0),    // sun position (remains fixed throughout the simulation)
+                m        :	10*1.98855e30,       // sun mass in kg
+                r        :	696342000            // sun radius in meter
+        }
 
 	// Color and style definitions
-	this.style = {
-		colBack    	:	'#112255', //'rgb(15,15,30)',
+        this.style = {
+                colBack    	 :      '#112255', //'rgb(15,15,30)',
 
-		// Earth
-		colEarth	:  	'rgb(30,130,220)',
-		colEarthDark	:	'rgba(0, 0, 0, 0.7)',		
-		colEarthOutline :	'darkGrey',
+                // Earth
+                colEarth	 :      'rgb(30,130,220)',
+                colEarthDark	 :      'rgba(0, 0, 0, 0.7)',		
+                colEarthOutline  :      'darkGrey',
 
-		// Moon
-		colMoon		:	'white',
-		colMoonDark	:	'rgba(0, 0, 0, 0.9)',
-		colMoonOutline	:	'darkGrey',
+                // Moon
+                colMoon		 :      'white',
+                colMoonDark	 :      'rgba(0, 0, 0, 0.9)',
+                colMoonOutline	 :      'darkGrey',
 
-		// 
-		colVec1  	: 	'rgba(255, 255, 255, 0.4)', // white -ish
-		colVec2  	: 	'rgba(255, 128, 128, 0.4)', // orange -ish
-		colVec3  	: 	'#ffffff',
-      		colVec4  	: 	'rgba(255, 165, 0, 0.8)',
-      		colWater  	: 	'rgba(30, 130, 220, 0.7)',
-		colOrbit        :       'rgba(255, 165, 0, 0.5)',
-		colOrigin	:	'yellow',
-		colCenterOfEarth:	'rgba(255, 165, 0,   1)',
-                colSun          :	'rgba(255, 235, 50, 0.5)'
-	};
+                // 
+                colVec1  	 :      'rgba(255, 255, 255, 0.4)', // white -ish
+                colVec2  	 :      'rgba(255, 128, 128, 0.4)', // orange -ish
+                colVec3  	 :      '#ffffff',
+                colVec4  	 :      'rgba(255, 165, 0, 0.8)',
+                colWater  	 :      'rgba(30, 130, 220, 0.7)',
+                colOrbit         :      'rgba(255, 165, 0, 0.5)',
+                colOrigin	 :      'yellow',
+                colCenterOfEarth :      'rgba(255, 165, 0,   1)',
+                colSun           :      'rgba(255, 235, 50, 0.5)'
+        };
 
 	this.dragDropImage = new Image();
 	this.dragDropImage.src = this.config.path + "/images/dragdrop.png";
@@ -389,14 +389,13 @@ World.prototype.renderSun = function() {
 	// draw sunbeams to the lookAt Position
 	var cm = this.mapToScreen(this.lookAt);
 
-
 	// Draw an arrow pointing from the sun towards earth
 	var posSunScreen = this.mapToScreen(this.sun.pos, this.scaleDist);
         var posEarthScreen = this.mapToScreen(this.earth.pos, this.scaleDist);	
 
 	var vecBeam = posSunScreen.clone().subtract(cm).normalize()
-	var vecBeamOrtho = new Vector(vecBeam.y, -vecBeam.x).multiplyValue(this.earth.r * this.scaleDist)
-	var offset = vecBeam.multiplyValue(this.earth.r * this.scaleDist * 0)
+	var vecBeamOrtho = new Vector(vecBeam.y, -vecBeam.x).multiplyValue(this.earth.r * this.scaleSize)
+	var offset = vecBeam.multiplyValue(this.earth.r * this.scaleSize * -1)
 
 	// render 5 lightbeams as an indication of where the sun is
 	for (var i=0; i<10; ++i)
@@ -462,7 +461,7 @@ World.prototype.renderMoon = function() {
 
 World.prototype.renderEarth = function() {
 	// compute the render position based on the earth position and the camera position
-	var posEarthScreen = this.mapToScreen(this.earth.pos, this.scaleSize);
+	var posEarthScreen = this.mapToScreen(this.earth.pos, this.scaleDist);
 	var r = this.earth.r * this.scaleSize;
 
 	// Daysite
@@ -568,23 +567,22 @@ World.prototype.renderSurfacePoints = function() {
 	var v2 = this.moon.pos.clone().multiplyValue(this.moon.m);
 	var cm = this.mapToScreen(Vector.addEx(v1, v2).divideValue(this.earth.m + this.moon.m));
 
-	var orig = new Vector(0,  this.earth.r);
-	// Orbits of 2 Reference Points at the earths surface
+        // Earth Position on screen
+        var posEarthScreen = this.mapToScreen(this.earth.pos, this.scaleDist);
+
+	var orig = new Vector(0,  this.earth.r * this.scaleSize);
+
+	// Orbits of a number of reference points at the earths surface
 	for (var angle=0; angle<360; angle+=120)
         {
-		// Vector from the earth center to a point at the surface
-		var ref = orig.rotateEx(angle);
+		var ref = orig.rotateEx(angle);                // Vector from the earth center to a point at the surface
+		var point = Vector.addEx(posEarthScreen, ref); // Point on the earth surface
 
-		// Point on the earth surface
-		var point = Vector.addEx(this.earth.pos, ref);  // Point 1 on the surface	
-		point = this.mapToScreen(point);
-
-		// 
 		var v = Vector.subtractEx(ref, point);
 		v = v.normalize().multiplyValue(30);
 
-		var refScreen = Vector.addEx(cm, ref.clone().multiplyValue(this.scaleSize));
-		this.ctx.drawCircle(refScreen, this.distCenterOfMass * this.scaleSize, 0, 2*Math.PI, null, this.style.colVec1);
+		var refScreen = Vector.addEx(cm, ref.clone());
+		this.ctx.drawCircle(refScreen, this.distCenterOfMass * this.scaleDist, 0, 2*Math.PI, null, this.style.colVec1);
 		this.ctx.drawCircle(point, 3, 0, 2*Math.PI, this.style.colVec1, this.style.colVec1);
 
 		var v = Vector.subtractEx(point, refScreen);
@@ -619,7 +617,7 @@ World.prototype.renderUnderlay = function() {
 
 		// Earth Orbit
 		if (this.config.showEarthOrbit) {
-			this.ctx.drawCircle(cm, this.distCenterOfMass * this.scaleSize, 0, 2*Math.PI, null, this.style.colOrbit);
+			this.ctx.drawCircle(cm, this.distCenterOfMass * this.scaleDist, 0, 2*Math.PI, null, this.style.colOrbit);
 		}
 
 		// Moon Orbit
