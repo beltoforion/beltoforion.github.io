@@ -590,8 +590,6 @@ World.prototype.renderSurfacePoints = function() {
 
         var len = this.earth.tidalForce[0].clone().length() * f
 
-        console.log("tf moon: " + this.earth.tidalForce[0].clone().length())
-
         // Orbits of a number of reference points at the earths surface
         for (var angle=0; angle<360; angle+=120) {
                 var ref = orig.rotateEx(angle)                // Vector from the earth center to a point at the surface
