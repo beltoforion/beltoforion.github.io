@@ -24,11 +24,16 @@
         <td class="noborder">	
           <form> 
             <h2>Animation Settings</h2> 
+
+            <fieldset>
+                <b>Run / Stop</b><br/>
+                <button type="button" id="btnRun"  onClick="OnClickRunStop()">Run</button>
+            </fieldset>
+
             <fieldset> 
               <b>Look at</b> 
               <select id="cbViewPoint" name="viewpoint" onChange="OnChangeViewPoint();">
 	        <option value="Earth">Earth</option>
-                <option value="Moon">Moon</option>
                 <option value="CenterOfMass">Center of Mass</option>
               </select>
             </fieldset>
@@ -51,16 +56,18 @@
 
             <fieldset>  
 	      <b>Force display</b><br/>
-              <input type="checkbox"  name="force" value="true" id="cbShowTidalAcc"      onChange="OnShowTidalAcc();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowTidalAcc"      onChange="OnShowTidalAcc()"/>
               Show Tidal Acceleration (Moon)<br/>
-              <input type="checkbox"  name="force" value="true" id="cbShowTidalAccSun"   onChange="OnShowTidalAccSun();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowTidalAccSun"   onChange="OnShowTidalAccSun()"/>
               Show Tidal Acceleration (Sun)<br/>
-              <input type="checkbox"  name="force" value="true" id="cbShowOcean"         onChange="OnShowOcean();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowOcean"         onChange="OnShowOcean()"/>
               Show Ocean<br/>
-              <input type="checkbox"  name="force" value="true" id="cbShowGravAcc"       onChange="OnShowGravAcc();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowGravAcc"       onChange="OnShowGravAcc()"/>
               Show Gravitational Acceleration (From Moon)<br/>
-              <input type="checkbox"  name="force" value="true" id="cbShowCentAcc"       onChange="OnShowCentAcc();"/>
+              <input type="checkbox"  name="force" value="true" id="cbShowCentAcc"       onChange="OnShowCentAcc()"/>
               Show Centrifugal Acceleration<br/>
+              <input type="checkbox"  name="force" value="true" id="cbScaleForceToModel" onChange="OnScaleForceToModel()"/>
+              Match Vector Directions to Model Scale<br/>
             </fieldset>
           </form>
         </td>
@@ -74,8 +81,8 @@
                                                    autoMove           : true,
                                                    setup              : 1,
 	                                           isRunning          : true,
-                                                   showSun            : false,
-                                                   useDifferentScales : true,
+                                                   showSun            : true,
+                                                   scaleForceToModel  : false,
                                                    showMoon           : true,
                                                    showMoonOrbit      : true,
                                                    showEarthOrbit     : true,
@@ -97,6 +104,8 @@
 		document.getElementById("cbShowCentAcc").checked        = tidalModel.config.showCentAcc;
 		document.getElementById("cbShowMoon").checked           = tidalModel.config.showMoon;
 		document.getElementById("cbShowSun").checked            = tidalModel.config.showSun;
+		document.getElementById("cbScaleForceToModel").checked  = tidalModel.config.scaleForceToModel;
+                document.getElementById("btnRun").innerHTML  = "Stop";
 
 		function OnChangeViewPoint()
 		{
@@ -148,6 +157,23 @@
 		function OnShowMoon()
 		{
                         tidalModel.config.showMoon = document.getElementById("cbShowMoon").checked;
+		}
+
+		function OnScaleForceToModel()
+		{
+                        tidalModel.setScaleForceToModel(document.getElementById("cbScaleForceToModel").checked);
+		}
+
+		function OnClickRunStop()
+		{
+                        if (tidalModel.ts==0) {
+                                tidalModel.ts = 86400/10
+                                document.getElementById("btnRun").innerHTML  = "Stop";
+        
+                        } else {
+                                tidalModel.ts = 0
+                                document.getElementById("btnRun").innerHTML  = "Run";
+                        }
 		}
 	</script>
 </body>
