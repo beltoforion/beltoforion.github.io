@@ -19,9 +19,13 @@
 //      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //      Version 1.1:
-//              - added a way to use vector directions that match the model sizes
-//                absolute values are rubbish then but they are scaled to appear
-//                similar to the physically correct model
+//              - added a way to use vector directions that match the model sizes absolute values 
+//                are rubbish then but they are scaled to appear similar to the physically correct 
+//                model
+//      Version 1.2:
+//              - Bugfix: It wasn't possible to show the tidal acceleration of sun alone
+//              - Added capabilitie to display static states (for neap tide and spring tide visualization)
+//
 //-------------------------------------------------------------------------------------------------
 
 var World = function(cv, cfg) {
@@ -265,23 +269,29 @@ World.prototype.mapToScreen = function(v, scale) {
 //
 //-------------------------------------------------------------------------------------------------
 
+// Set angular Position of Sun, Earth and Moon
+World.prototype.setPositions = function(angleSun, angleMoon) {
+
+        // Earth position is relative to the center of mass
+        this.earth.pos.x = -Math.sin(angleMoon) * this.distCenterOfMass
+        this.earth.pos.y = -Math.cos(angleMoon) * this.distCenterOfMass
+
+        // Moon position relative to the center of mass
+        this.moon.pos.x = Math.sin(angleMoon) * (this.distMoonEarth - this.distCenterOfMass)
+        this.moon.pos.y = Math.cos(angleMoon) * (this.distMoonEarth - this.distCenterOfMass)
+
+        // Sun motion, shown by beams of light
+        this.sun.pos.x = this.earth.pos.x + Math.sin(angleSun) * this.distEarthSun
+        this.sun.pos.y = this.earth.pos.y + Math.cos(angleSun) * this.distEarthSun
+}
+
 World.prototype.move = function() {
 
         if (this.config.autoMove) {
-                // Earth position is relative to the center of mass
-                var a = this.time * 2 * Math.PI / this.moon.p
-                this.earth.pos.x = -Math.sin(a) * this.distCenterOfMass
-                this.earth.pos.y = -Math.cos(a) * this.distCenterOfMass
-
-                // Moon position relative to the center of mass
-                a = this.time * 2 * Math.PI / this.moon.p
-                this.moon.pos.x = Math.sin(a) * (this.distMoonEarth - this.distCenterOfMass)
-                this.moon.pos.y = Math.cos(a) * (this.distMoonEarth - this.distCenterOfMass)
-
-                // Sun motion, shown by beams of light
-                a = this.time * 2 * Math.PI / this.earth.p
-                this.sun.pos.x = this.earth.pos.x + Math.sin(a) * this.distEarthSun
-                this.sun.pos.y = this.earth.pos.y + Math.cos(a) * this.distEarthSun
+                var angleMoon  = this.time * 2 * Math.PI / this.moon.p
+                var angleSun   = this.time * 2 * Math.PI / this.earth.p
+                this.setPositions(angleSun, angleMoon)
+                this.time += this.ts
         }
 
         // update the position vectors
@@ -312,7 +322,7 @@ World.prototype.move = function() {
 
 World.prototype.update = function() {
 
-        this.time += this.ts
+        this.move()
 
         var delta = 2 * Math.PI / this.numArrows
 
@@ -390,7 +400,6 @@ World.prototype.update = function() {
                 // The resulting Gravitational force
                 this.earth.tidalForceSun[i] = accSun.multiplyValue(scaleCompensation)
         }	
-
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -503,7 +512,11 @@ World.prototype.renderEarth = function() {
         var tf  = this.earth.tidalForce[0].clone()
         var tfs = this.earth.tidalForceSun[0].clone()
 
-        if (this.config.showGravAcc || this.config.showCentAcc || this.config.showTidalAcc || this.config.showAccSum) {
+        if (this.config.showGravAcc     || 
+            this.config.showCentAcc     || 
+            this.config.showTidalAcc    || 
+            this.config.showTidalAccSun || 
+            this.config.showAccSum) {
                 var results = [this.numArrows + 1]
 	
                 // Draw Vector arrows
@@ -616,7 +629,7 @@ World.prototype.renderOverlays = function() {
         // Draw Center of Mass of the system Earth-Moon
         // Use scaling to size since the center of mass shall be drawn at the correct size relative to earth
         var cm = this.mapToScreen(this.vecCenterOfMass, this.scaleSize)
-        this.ctx.drawCenterOfMass(cm, 6)
+        this.ctx.drawCenterOfMass(cm, 4)
 
         // Render Reference Frame Origin
         if (this.config.showSurfacePoints) {
@@ -776,13 +789,11 @@ function tidalSimulation(cfg) {
                         timer = window.setInterval(tick, 30)
                 } else {
                         world.update()
-                        world.update()
                         world.render()
                 }
         }
 
         function tick() {
-                world.move()
                 world.update()
                 world.render()
         }
