@@ -87,7 +87,7 @@ var World = function(cv, cfg) {
         } else if (cfg.setup==1) {
                 this.setScaleForceToModel(cfg.scaleForceToModel)
 
-                this.ts = 86400/10                            // timestep size in seconds timesteps for the blinking 
+                this.ts = 86400/50                            // timestep size in seconds timesteps for the blinking 
                 this.scaleDist = 0.00000065                   // scale for dimensions
                 this.scaleSize = 0.00001                      // scale for sizes	
                 this.scaleContext = this.scaleSize
@@ -122,6 +122,8 @@ var World = function(cv, cfg) {
 
         // Color and style definitions
         this.style = {
+                enableBackgroundImage : false,
+
                 colBack          : '#112255',
 
                 // Earth
@@ -151,6 +153,12 @@ var World = function(cv, cfg) {
 
         this.continentsImage = new Image()
         this.continentsImage.src = this.config.path + "/images/continents.png"
+
+        this.moonImage = new Image()
+        this.moonImage.src = this.config.path + "/images/moon.png"
+
+        this.bckgImage = new Image()
+        this.bckgImage.src = this.config.path + "/images/milkyway.jpg"
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -246,6 +254,61 @@ World.prototype.setScaleForceToModel = function(stat) {
 // Helper Functions
 //
 //-------------------------------------------------------------------------------------------------
+
+/**
+ * Based on: http://stackoverflow.com/questions/21961839/simulation-background-size-cover-in-canvas
+ * by By Ken Fyrstenberg
+ */
+World.prototype.addBackground = function() {
+
+        img = this.bckgImage
+        ctx = this.ctx
+
+        x = y = 0;
+        w = ctx.canvas.width;
+        h = ctx.canvas.height;
+
+        offsetX = typeof offsetX === "number" ? offsetX : 0.5;
+        offsetY = typeof offsetY === "number" ? offsetY : 0.5;
+
+        if (offsetX < 0) offsetX = 0;
+        if (offsetY < 0) offsetY = 0;
+        if (offsetX > 1) offsetX = 1;
+        if (offsetY > 1) offsetY = 1;
+
+        var iw = img.width,
+            ih = img.height,
+            r = Math.min(w / iw, h / ih),
+            nw = iw * r,   // new prop. width
+            nh = ih * r,   // new prop. height
+            cx, cy, cw, ch, ar = 1;
+
+        // decide which gap to fill    
+        if (nw < w) ar = w / nw;
+        if (nh < h) ar = h / nh;
+        nw *= ar;
+        nh *= ar;
+
+        // calc source rectangle
+        cw = iw / (nw / w);
+        ch = ih / (nh / h);
+
+        cx = (iw - cw) * offsetX;
+        cy = (ih - ch) * offsetY;
+
+        // make sure source rectangle is valid
+        if (cx < 0) cx = 0;
+        if (cy < 0) cy = 0;
+        if (cw > iw) cw = iw;
+        if (ch > ih) ch = ih;
+
+        ctx.drawImage(img, cx, cy, cw, ch,  x, y, w, h);
+}
+
+World.prototype.resizeToCanvas = function() {
+        this.w = this.canvas.width
+        this.h = this.canvas.height
+}
 
 World.prototype.mapToScreen = function(v, scale) {
 
@@ -462,6 +525,17 @@ World.prototype.renderMoon = function() {
 
         this.ctx.drawCircle(posMoon, r, 0, 2 * Math.PI, this.style.colMoon, colOutline, thickness)
 
+        // continents
+        if (this.config.enableRotation) {
+                this.ctx.save()
+                this.ctx.translate(posMoon.x, posMoon.y);
+                this.ctx.rotate(-this.time * Math.PI * 2 / this.moon.p + Math.PI)
+                this.ctx.drawImage(this.moonImage, -r, -r, 2*r, 2*r)
+                this.ctx.restore()
+        } else {
+                this.ctx.drawImage(this.moonImage, posMoon.x - r, posMoon.y - r, 2*r, 2*r)
+        }
+
         // dark side
         if (this.config.showSun) {
                 var a1 = this.vecEarthSun.verticalAngle()
@@ -500,7 +574,15 @@ World.prototype.renderEarth = function() {
         this.ctx.drawCircle(posEarthScreen, r, 0, 2 * Math.PI, this.style.colEarth, this.style.colEarthOutline)
 
         // continents
-        this.ctx.drawImage(this.continentsImage, posEarthScreen.x - r, posEarthScreen.y - r, 2*r, 2*r)
+        if (this.config.enableRotation) {
+                this.ctx.save()
+                this.ctx.translate(posEarthScreen.x, posEarthScreen.y);
+                this.ctx.rotate(-this.time * Math.PI * 2 / 86400)
+                this.ctx.drawImage(this.continentsImage, -r, -r, 2*r, 2*r)
+                this.ctx.restore()
+        } else {
+                this.ctx.drawImage(this.continentsImage, posEarthScreen.x - r, posEarthScreen.y - r, 2*r, 2*r)
+        }
 
         // Nightside
         if (this.config.showSun) {
@@ -659,6 +741,10 @@ World.prototype.renderUnderlay = function() {
 
 
 World.prototype.render = function() {
+        if (this.style.enableBackgroundImage) {
+                this.addBackground()
+        }
+
         this.ctx.fillStyle = this.style.colBack
         this.ctx.fillRect(0,0, this.w, this.h)
 
