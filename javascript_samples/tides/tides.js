@@ -89,7 +89,7 @@ var World = function(cv, cfg) {
 
                 this.ts = 86400/50                            // timestep size in seconds timesteps for the blinking 
                 this.scaleDist = 0.00000065                   // scale for dimensions
-                this.scaleSize = 0.00001                      // scale for sizes	
+                this.scaleSize = 0.000011                     // scale for sizes	
                 this.scaleContext = this.scaleSize
 
                 this.earth = {
@@ -141,7 +141,7 @@ var World = function(cv, cfg) {
                 colVec2          : 'rgba(255, 128, 128, 0.4)', // orange -ish
                 colVec3          : '#ffffff',
                 colVec4          : 'rgba(255, 165, 0, 0.8)',
-                colWater         : 'rgba(30, 130, 220, 0.8)',
+                colWater         : 'rgba(30, 130, 220, 0.7)',
                 colOrbit         : 'rgba(255, 165, 0, 0.5)',
                 colOrigin        : 'yellow',
                 colCenterOfEarth : 'rgba(255, 165, 0,   1)',

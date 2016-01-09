@@ -8,7 +8,7 @@
   <link rel="stylesheet" type="text/css" href="./styles/article.css"/>
 </head>
 
-<body class="article" style="background: url(./javascript_samples/tides/images/milkyway.jpg); background-size: cover;">
+<body class="article" bgcolor="#000">
   <canvas id="cvTides" width="800" height="800"></canvas>
   <script>
         var canvas = document.getElementById("cvTides")
@@ -33,11 +33,11 @@
                                                 showCentAcc        : false,
                                                 showTidalAcc       : true,
                                                 showTidalAccSun    : true,
-                                                showAccSum         : false,
+                                                showAccSum         : true,
                                                 enableRotation     : true });
-             tidalModel.scaleDist = 0.0000012
-             tidalModel.scaleSize = 0.00002
-             tidalModel.ts = 86400 / 100
+             tidalModel.scaleDist = 0.0000011
+             tidalModel.scaleSize = 0.000016
+             tidalModel.ts = 86400 / 50
              tidalModel.accMultiplier = 1700000
              tidalModel.forceMultiplier = 20*tidalModel.accMultiplier
              tidalModel.style.enableBackgroundImage = true                
