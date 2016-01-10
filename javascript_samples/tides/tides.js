@@ -87,7 +87,7 @@ var World = function(cv, cfg) {
         } else if (cfg.setup==1) {
                 this.setScaleForceToModel(cfg.scaleForceToModel)
 
-                this.ts = 86400/50                            // timestep size in seconds timesteps for the blinking 
+                this.ts = 86400/25                            // timestep size in seconds timesteps for the blinking 
                 this.scaleDist = 0.00000065                   // scale for dimensions
                 this.scaleSize = 0.000011                     // scale for sizes	
                 this.scaleContext = this.scaleSize
@@ -133,15 +133,15 @@ var World = function(cv, cfg) {
 
                 // Moon
                 colMoon	         : 'white',
-                colMoonDark      : 'rgba(0, 0, 0, 0.9)',
-                colMoonOutline   : 'darkGrey',
+                colMoonDark      : 'rgba(0, 0, 0, 0.7)',
+                colMoonOutline   : 'rgba(0, 0, 0, 0)', //'darkGrey',
 
                 // 
                 colVec1          : 'rgba(255, 255, 255, 0.4)', // white -ish
                 colVec2          : 'rgba(255, 128, 128, 0.4)', // orange -ish
                 colVec3          : '#ffffff',
                 colVec4          : 'rgba(255, 165, 0, 0.8)',
-                colWater         : 'rgba(30, 130, 220, 0.7)',
+                colWater         : 'rgba(30, 130, 220, 0.6)',
                 colOrbit         : 'rgba(255, 165, 0, 0.5)',
                 colOrigin        : 'yellow',
                 colCenterOfEarth : 'rgba(255, 165, 0,   1)',
