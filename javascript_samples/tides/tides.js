@@ -86,8 +86,7 @@ var World = function(cv, cfg) {
                 this.canvas.world = this
         } else if (cfg.setup==1) {
                 this.setScaleForceToModel(cfg.scaleForceToModel)
-
-                this.ts = 86400/25                            // timestep size in seconds timesteps for the blinking 
+                this.ts = cfg.timestep                     // timestep size in seconds timesteps for the blinking 
                 this.scaleDist = 0.00000065                   // scale for dimensions
                 this.scaleSize = 0.000011                     // scale for sizes	
                 this.scaleContext = this.scaleSize
