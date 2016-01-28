@@ -6,8 +6,8 @@ For more details on the Javascript applets please refer to their original web pa
 - Conveys Game of Life:		
 http://articles.beltoforion.de/article.php?a=game_of_life	
 
-- Simulated evolution:      
+- Simulating basic evolution in a web browser:
 http://articles.beltoforion.de/article.php?a=simulated_evolution
 
-- Tidal Simulation:			
+- Explaining Tides with the Tidal Simulation Applet:			
 http://articles.beltoforion.de/article.php?a=tides_explained
