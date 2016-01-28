@@ -2,6 +2,12 @@
 This is the demonstration page for the educational javascripts
 
 Content:
-- Conveys Game of Life
-- Simulated evolution 
-- Tidal Simulation
+
+- Conveys Game of Life:		
+http://articles.beltoforion.de/article.php?a=game_of_life	
+
+- Simulated evolution:      
+http://articles.beltoforion.de/article.php?a=simulated_evolution
+
+- Tidal Simulation:			
+http://articles.beltoforion.de/article.php?a=tides_explained
