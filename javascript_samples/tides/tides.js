@@ -104,7 +104,7 @@ var World = function(cv, cfg) {
                         pos : new Vector(0, 0), // moon position
                         m   : 7.349e22,         // moon mass
                         r   : 3476/2.0*1000,    // moon radius in meter
-                        p   : 27.322 * 86400    // siderial in seconds
+                        p   : 27.322 * 86400,   // siderial in seconds
                 }
 
                 // Distance of the center of mass from the earth center (4672.68 km)
@@ -513,44 +513,62 @@ World.prototype.renderMoon = function() {
 
         var r = this.moon.r * this.scaleSize
 
-        // bright side
-        var colOutline = this.style.colMoonOutline
-        var thickness = 2
-        if (!this.config.setup==1) {
-                var v = Math.round(128 + 128 * Math.sin(this.time*0.15))
-                colOutline = 'rgb(' + v + ',' + v + ',' + v + ')'	
-                thickness = 4
-        }
+	
+	if (this.config.setup==0 && this.vecEarthMoon.length()>100000000) {
+	        posEarth = this.mapToScreen(this.earth.pos.clone(), this.scaleDist)
 
-        this.ctx.drawCircle(posMoon, r, 0, 2 * Math.PI, this.style.colMoon, colOutline, thickness)
+		// If moon is far away just render an arrow pointing towards it
+		var buf = this.vecEarthMoon.normalize().multiplyValue(100);
+		this.ctx.drawVector(posEarth.x + 3 * buf.x, 
+                                    posEarth.y + 3 * buf.y,
+                                    buf.x,
+				    buf.y,
+                                    30,
+                                    2,
+                                    this.style.colMoon);
+        	this.ctx.font="20px Arial"
+        	this.ctx.fillStyle='White'
+        	this.ctx.fillText("Moon (385000 km)", posEarth.x + 3 * buf.x - 40, posEarth.y + 3 * buf.y + 40)
 
-        // continents
-        if (this.config.enableRotation) {
-                this.ctx.save()
-                this.ctx.translate(posMoon.x, posMoon.y);
-                this.ctx.rotate(-this.time * Math.PI * 2 / this.moon.p + Math.PI)
-                this.ctx.drawImage(this.moonImage, -r, -r, 2*r, 2*r)
-                this.ctx.restore()
-        } else {
-                this.ctx.drawImage(this.moonImage, posMoon.x - r, posMoon.y - r, 2*r, 2*r)
-        }
+	} else {
+	        // bright side
+	        var colOutline = this.style.colMoonOutline
+	        var thickness = 2
+        	if (!this.config.setup==1) {
+                	var v = Math.round(128 + 128 * Math.sin(this.time*0.15))
+                	colOutline = 'rgb(' + v + ',' + v + ',' + v + ')'	
+	                thickness = 4
+        	}
 
-        // dark side
-        if (this.config.showSun) {
-                var a1 = this.vecEarthSun.verticalAngle()
-                var a2 = a1 + Math.PI
-                this.ctx.drawCircle(posMoon, r, a1, a2, this.style.colMoonDark, this.style.colMoonOutline)
-        }
+	        this.ctx.drawCircle(posMoon, r, 0, 2 * Math.PI, this.style.colMoon, colOutline, thickness)
 
-        if (this.config.setup==0) {
-                this.ctx.drawImage(this.dragDropImage, posMoon.x - r, posMoon.y - r, 2*r, 2*r)
-        }
+	        if (this.config.enableRotation) {
+			this.ctx.save()
+			this.ctx.translate(posMoon.x, posMoon.y);
+			this.ctx.rotate(-this.time * Math.PI * 2 / this.moon.p + Math.PI)
+			this.ctx.drawImage(this.moonImage, -r, -r, 2*r, 2*r)
+			this.ctx.restore()
+		} else {
+	                this.ctx.drawImage(this.moonImage, posMoon.x - r, posMoon.y - r, 2*r, 2*r)
+		}
 
-        var offset = this.moon.r * this.scaleSize
+	        // dark side
+        	if (this.config.showSun) {
+        	        var a1 = this.vecEarthSun.verticalAngle()
+        	        var a2 = a1 + Math.PI
+        	        this.ctx.drawCircle(posMoon, r, a1, a2, this.style.colMoonDark, this.style.colMoonOutline)
+	        }
 
-        this.ctx.font="20px Arial"
-        this.ctx.fillStyle='White'
-        this.ctx.fillText("Moon", posMoon.x - 24, posMoon.y + offset + 25)
+        	if (this.config.setup==0) {
+        	        this.ctx.drawImage(this.dragDropImage, posMoon.x - r, posMoon.y - r, 2*r, 2*r)
+	        }
+
+	        var offset = this.moon.r * this.scaleSize
+
+        	this.ctx.font="20px Arial"
+        	this.ctx.fillStyle='White'
+        	this.ctx.fillText("Moon", posMoon.x - 24, posMoon.y + offset + 25)
+	}
 }
 
 

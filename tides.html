@@ -80,25 +80,27 @@
   </table>
 </div>
 	<script>
-                var tidalModel = tidalSimulation({ cvid               : 'cvTides2',
-                                                   path               : './javascript_samples/tides',	
-						   timestep           : 86400/10,
-                                                   lookAtTarget       : 'CenterOfMass',
-                                                   autoMove           : true,
-                                                   setup              : 1,
-	                                           isRunning          : true,
-                                                   showSun            : true,
-                                                   scaleForceToModel  : false,
-                                                   showMoon           : true,
-                                                   showMoonOrbit      : true,
-                                                   showEarthOrbit     : true, 
-                                                   showSurfacePoints  : false,
-                                                   showGravAcc        : false,
-                                                   showCentAcc        : false,
-                                                   showTidalAcc       : true,
-                                                   showTidalAccSun    : true,
-		                                   showAccSum         : true,
-                                                   enableRotation     : true });
+                var tidalModel = tidalSimulation({	
+							cvid			: 'cvTides2',
+                                                   	path			: './javascript_samples/tides',	
+							timestep		: 86400/10,
+							lookAtTarget		: 'CenterOfMass',
+                                                   	autoMove		: true,
+                                                   	setup			: 1,
+	                                           	isRunning		: true,
+                                                   	showSun			: true,
+                                                   	scaleForceToModel	: false,
+                                                   	showMoon		: true,
+                                                   	showMoonOrbit		: true,
+                                                   	showEarthOrbit		: true, 
+                                                   	showSurfacePoints	: false,
+                                                   	showGravAcc		: false,
+                                                   	showCentAcc		: false,
+                                                   	showTidalAcc		: true,
+                                                   	showTidalAccSun		: true,
+		                                   	showAccSum		: true,
+                                                   	enableRotation		: true 
+						});
                 updateControls()
 
                 function updateControls() {
